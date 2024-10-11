@@ -5,12 +5,13 @@ import numpy as np
 
 #turns a complex number into an rgb colour code where the hue represents the phase and the amplitude is the luminosity
 def complex_number_to_colour(z):
-	offset=2/3*np.pi
-	phase=((np.angle(z)-offset)%(2*np.pi))/(2*np.pi)
-	modulus=abs(z)
-	luminosity=(modulus<=1)
-	hsv=np.stack((phase,luminosity,luminosity),axis=-1)
-	return matplotlib.colors.hsv_to_rgb(hsv)
+	offset=1/3
+	phase=(np.angle(z)/(2*np.pi)-offset)%1
+	modulus=abs(z)#*np.exp(-0.1*(1+np.cos(3*np.angle(z))))
+	luminosity=(modulus<=1.000001)
+	hsv=np.stack((phase,modulus,luminosity),axis=-1)
+	rgb = matplotlib.colors.hsv_to_rgb(hsv)
+	return rgb
 
 #plot a 2d image of the complex vatues where the luminosity reperesents the aplitude (max=1) and the hue represents the phase,
 def plot(complex_values):
@@ -36,4 +37,6 @@ def plot(complex_values):
 	ax2.set_xticks([0,np.pi/2,np.pi,3/2*np.pi])
 	ax2.set_xticklabels(['1','i','-1','-i'])
 	ax2.grid(False)
+	#plt.show()
 	plt.show()
+
