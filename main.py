@@ -8,20 +8,16 @@ import plotter
 #define wavefunctions phi
 Z=2
 r0=0.52917#anstroms
-def phi(i,j,m,kappa,R):
+n=[(0,0,0)]
+def phi(n,kappa,R):
 	r1_norm=np.linalg.norm(r2,axis=-1)
 	r2_norm=np.linalg.norm(r2,axis=-1)
 	return (r1_norm+r2_norm)**i*(r1_norm-r2_norm)**j*np.linalg.norm(r1-r2,axis=-1)**m*np.exp(-Z*(r1_norm+r2_norm)/(kappa*r0))
 
-#test phi by plotting it
-x=np.linspace(-2,2,100)
-R=np.transpose(np.meshgrid(x,x,x,x))
-Phi=10*phi(0,0,0,1,r)
-#print(np.shape(Phi))
-#plotter.plot(Phi)
-
-#plt.show()
 #calculate norms and save in matrix N
+dim=np.shape(n)[-1]
+N=np.array[(n,n)]
+N=
 
 #b) calculate matices beta sqrt_beta inverse_sqrt_beta Y Y_T
 
