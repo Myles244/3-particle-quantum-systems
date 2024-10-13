@@ -6,6 +6,7 @@ def integrate(function, N, width, max):
 	#the output dimesnion extends from -max to max
 
 	#could using gaussian random values reduce uncertant, uthis would eeffect the formlas tho
+	#their might be a way to estemate the error on this integral without doing it a bunch check wikipedia
 
 	#genrate N random input vectors
 	random_inputs=(np.random.random((N,4))-0.5)*2*width
