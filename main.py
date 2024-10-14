@@ -31,42 +31,53 @@ def acurate_integrate(function, N_integrals, N_points,width, min, max):
 		values[i]=integrate(function, N_points, width,min, max)
 	return np.mean(values),np.std(values)/np.sqrt(N_integrals-1)
 
-class State:
-	def __init__(self, wavefunction):
-		self.wavefunction = wavefunction
+#class State:
+#	def __init__(self, wavefunction):
+#		self.wavefunction = wavefunction
 
-	def norm(self):
-		def prod(R):
-			return np.absolute(self.wavefunction(R))
-		return acurate_integrate(prod,100,1000000, 10, 0, 1)
-
-class PseudoBasis:
-	def __innit__(self, basis_states):
-		self.basis_states = basis_states
+	#def norm(self):
+	#	return acurate_integrate(prod,100,100000, 8, 0, 1)
 
 #for an array of values of kappa
+k=1
 
 #a) calculate matrix N
 
 #define wavefunctions phi
 Z=2
 r0=0.52917#anstroms
-ijms=[(0,0,0)]
-def phi_wavefunction(ijm,kappa,R):
+ijms=np.array([[0,0,0],[0,0,1],[0,1,0],[1,0,0]])
+def phi(ijm,kappa,R):
 	r1_norm=np.sqrt(R[...,0]**2+R[...,1]**2)
 	r2_norm=np.sqrt(R[...,2]**2+R[...,3]**2)
 	r12_norm=np.sqrt((R[...,0]-R[...,2])**2+(R[...,1]-R[...,3])**2)
 	return (r1_norm+r2_norm)**ijm[0]*(r1_norm-r2_norm)**ijm[1]*r12_norm**ijm[2]*np.exp(-Z*(r1_norm+r2_norm)/(kappa*r0))
 
-phi=State(lambda R:phi_wavefunction(ijms[0],1,R))
+#create states with the wavefunctions phi_wavefuctions
+#phis=State(lambda R:phi_wavefunction(ijms,1,R))
 
+#calculate the matrix N, where N_nn'=<phi_n|phi_n'>
 
-#calculate norms and save in matrix N
-print(phi.norm())
-print((r0*np.pi/(2*Z))**2)
+#start by generating every combination of aloowed ijm values and storing them in an array where the index is the n/nprime
+ijm_ns,ijm_n_primes = np.meshgrid(np.arange(0,np.shape(ijms)[0]),np.arange(0,np.shape(ijms)[0]))
 
-#
+#calculate each element of the array by doing the integral associated with each 
+#using a loop here to avoid excessive memory usage since each element requires an integral with 1000000s of paramiters
+N=np.empty((np.shape(ijms)[0],np.shape(ijms)[0],2))
+for n,ijm_n in enumerate(ijm_ns):
+	for n_prime,ijm_n_prime in enumerate(ijm_n_primes):
+		N[n,n_prime]=acurate_integrate(
+			lambda R: phi(ijm_n,k,R)*phi(ijm_n_prime,k,R),
+			N_integrals=100,
+			N_points=1000000,
+			width=4,
+			min=-1,
+			max=1,
+		)
 
+print(N)
+
+#N=acurate_integrat e(lambda R: phi_wavefunction())
 
 #b) calculate matices beta sqrt_beta inverse_sqrt_beta Y Y_T
 
