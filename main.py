@@ -8,6 +8,12 @@ def integrate(function, N, width):
 
 	return (64*width**6)*np.sum(function(random_inputs))/N
 
+def gaussian_integrate(function, N, stddev):
+
+	random_inputs=(np.random.normal(0,stddev,(N,6)))
+
+	return np.sum(function(random_inputs)*((stddev**6)*8*np.pi**3)*np.exp(((np.linalg.norm(random_inputs,axis=-1)/stddev)**2)/2))/N
+
 def acurate_integrate(function, N_integrals, N_points,width):
 	#repeatedly do the integral and return the mean and standard error
 
@@ -17,6 +23,13 @@ def acurate_integrate(function, N_integrals, N_points,width):
 		print(i,values[i],np.mean(values[0:i+1]),np.std(values[0:i+1])/np.sqrt(i))
 	return np.mean(values),np.std(values)/np.sqrt(N_integrals-1)
 
+def acurate_gaussian_integrate(function, N_integrals, N_points, stddev):
+
+	values=np.empty((N_integrals))
+	for i in range(N_integrals):
+		values[i]=gaussian_integrate(function, N_points, stddev)
+		print(i,values[i],np.mean(values[0:i+1]),np.std(values[0:i+1])/np.sqrt(i))
+	return np.mean(values),np.std(values)/np.sqrt(N_integrals-1)
 #class State:
 #	def __init__(self, wavefunction):
 #		self.wavefunction = wavefunction
@@ -56,9 +69,18 @@ for n in ns:
 	for n_prime in n_primes:
 		N[n,n_prime]=acurate_integrate(
 			lambda R: phi(ijms[n],k,R)*phi(ijms[n_prime],k,R),
-			N_integrals=100,
-			N_points=10000000, #10million is a sensibe max
+			N_integrals=10,
+			N_points=1000000, #10million is a sensibe max
 			width=3
+		)
+
+for n in ns:
+	for n_prime in n_primes:
+		N[n,n_prime]=acurate_gaussian_integrate(
+			lambda R: phi(ijms[n],k,R)*phi(ijms[n_prime],k,R),
+			N_integrals=10,
+			N_points=1000000, #10million is a sensibe max
+			stddev=r0
 		)
 
 print(N)
