@@ -7,11 +7,8 @@ def integrate(function, N, width, min, max):
 	#each input dimenstion extends from -width to width
 	#the output dimesnion extends from -max to max
 
-	#could using gaussian random values reduce uncertant, uthis would eeffect the formlas tho
-	#their might be a way to estemate the error on this integral without doing it a bunch check wikipedia
-
 	#genrate N random input vectors
-	random_inputs=(np.random.random((N,4))-0.5)*2*width
+	random_inputs=(np.random.random((N,6))-0.5)*2*width
 
 	#generate N random outputs
 	random_outputs=min+(np.random.random((N)))*(max-min)
@@ -21,7 +18,7 @@ def integrate(function, N, width, min, max):
 
 	#return the volume
 	#which is the probability that it was inside the function times the toatl area then adding the offset from the min 
-	return ((N_inside/N)*(max-min)+min)*16*width**4
+	return ((N_inside/N)*(max-min)+min)*64*width**6
 
 def acurate_integrate(function, N_integrals, N_points,width, min, max):
 	#repeatedly do the integral and return the mean and standard error
@@ -29,6 +26,7 @@ def acurate_integrate(function, N_integrals, N_points,width, min, max):
 	values=np.empty((N_integrals))
 	for i in range(N_integrals):
 		values[i]=integrate(function, N_points, width,min, max)
+		print(i,values[i],np.mean(values[0:i+1]),np.std(values[0:i+1])/np.sqrt(i))
 	return np.mean(values),np.std(values)/np.sqrt(N_integrals-1)
 
 #class State:
@@ -46,11 +44,11 @@ k=1
 #define wavefunctions phi
 Z=2
 r0=0.52917#anstroms
-ijms=np.array([[0,0,0],[0,0,1],[0,1,0],[1,0,0]])
+ijms=np.array([[0,0,0]])#,[0,0,1],[0,1,0],[1,0,0]])
 def phi(ijm,kappa,R):
-	r1_norm=np.sqrt(R[...,0]**2+R[...,1]**2)
-	r2_norm=np.sqrt(R[...,2]**2+R[...,3]**2)
-	r12_norm=np.sqrt((R[...,0]-R[...,2])**2+(R[...,1]-R[...,3])**2)
+	r1_norm=np.sqrt(R[:,0]**2+R[:,1]**2+R[:,2]**2)
+	r2_norm=np.sqrt(R[:,3]**2+R[:,4]**2+R[:,5]**2)
+	r12_norm=np.sqrt((R[:,0]-R[:,3])**2+(R[:,1]-R[:,4])**2+(R[:,2]-R[:,5])**2)
 	return (r1_norm+r2_norm)**ijm[0]*(r1_norm-r2_norm)**ijm[1]*r12_norm**ijm[2]*np.exp(-Z*(r1_norm+r2_norm)/(kappa*r0))
 
 #create states with the wavefunctions phi_wavefuctions
@@ -58,20 +56,22 @@ def phi(ijm,kappa,R):
 
 #calculate the matrix N, where N_nn'=<phi_n|phi_n'>
 
-#start by generating every combination of aloowed ijm values and storing them in an array where the index is the n/nprime
-ijm_ns,ijm_n_primes = np.meshgrid(np.arange(0,np.shape(ijms)[0]),np.arange(0,np.shape(ijms)[0]))
+#start by generating every combination of ns and n_primes in the matrix
+ns=np.arange(0,np.shape(ijms)[0])
+n_primes=ns
 
 #calculate each element of the array by doing the integral associated with each 
 #using a loop here to avoid excessive memory usage since each element requires an integral with 1000000s of paramiters
 N=np.empty((np.shape(ijms)[0],np.shape(ijms)[0],2))
-for n,ijm_n in enumerate(ijm_ns):
-	for n_prime,ijm_n_prime in enumerate(ijm_n_primes):
+
+for n in ns:
+	for n_prime in n_primes:
 		N[n,n_prime]=acurate_integrate(
-			lambda R: phi(ijm_n,k,R)*phi(ijm_n_prime,k,R),
-			N_integrals=100,
-			N_points=1000000,
-			width=4,
-			min=-1,
+			lambda R: phi(ijms[n],k,R)*phi(ijms[n_prime],k,R),
+			N_integrals=10,
+			N_points=10000000, #10million is a sensibe max
+			width=3,			
+			min=0,
 			max=1,
 		)
 
