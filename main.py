@@ -12,15 +12,11 @@ Z=2
 #reduced plancs constant
 hbar=6.5821220*10**(-16)#eV
 #mass of electorn
-me=9.11*10**(-31)#kg
+me=hbar**2/(r0*e2)
 
-#plot the expected curve when single basis state is used
-kappas=np.linspace(0.5,3,1000)
-def test_E0(kappa):
-	return (e2/r0)*(4/(kappa**2)-27/(4*kappa))
 
 #the ijm value associated with each n value
-jkms=np.array([[0,0,0]])
+jkms=np.array([[0,0,0],[0,0,1]])#,[0,1,0],[1,0,0]])
 
 #the dimension of the vector space created by the phi_n vectors
 dim=np.shape(jkms)[0]
@@ -54,10 +50,10 @@ def fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl):
 def P(kappa):
 
 	#the N matrix
-	N=np.zeros((dim,dim))
+	N=np.zeros((dim,dim,np.size(kappa)))
 
 	#the H_tilde matrix
-	H_tilde=np.zeros((dim,dim))
+	H_tilde=np.zeros((dim,dim,np.size(kappa)))
 
 	#lambda
 	l=Z/(kappa*r0)
@@ -75,27 +71,58 @@ def P(kappa):
 			K=k+k_prime
 			M=m+m_prime
 			N[n,n_prime]=fN(J,K,M, ootl)
+			#print(fC(J,K,M,ootl))
+			#print(fW(J,K,M,ootl))
+			#print(fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl))
 			H_tilde[n,n_prime]=fC(J,K,M, ootl)+fW(J,K,M, ootl)+fT(j,j_prime,k,k_prime,m,m_prime,J,K,M, l,ootl)
 			#print(fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl))
+
+	#changing the N and H_tilde form matrices with lists as element to lists of matrices
+	N=np.transpose(N)
+	H_tilde=np.transpose(H_tilde)
 
 	#finding the eigen values of N
 	N_eigenvalues, N_eigenvectors=np.linalg.eig(N)
 
 	#calculating invs sqrt beta
-	invs_sqrt_beta=np.zeros((dim,dim))
+	invs_sqrt_beta=np.zeros((dim,dim,np.size(kappa)))
 	for n in range(dim):
-		invs_sqrt_beta[n,n]=1/np.sqrt(N_eigenvalues[n])
-	
+		invs_sqrt_beta[n,n]=1/np.sqrt(N_eigenvalues[:,n])
+	invs_sqrt_beta=np.transpose(invs_sqrt_beta)
+
 	#calculating Y
 	Y=N_eigenvectors
-	print(N)
-	print(H_tilde)
-	return invs_sqrt_beta@np.transpose(Y)@H_tilde@Y@invs_sqrt_beta
-myP=P(1)
-print(myP)
-E,_=np.linalg.eig(myP)
+	Y_T=np.transpose(Y,axes=[0,2,1])
 
-print(E)
-plt.scatter([1],E/2)
+	#returning P	
+	return invs_sqrt_beta@Y_T@H_tilde@Y@invs_sqrt_beta
+
+
+kappas=np.linspace(0.9,2,100)
+
+Ps=P(kappas)
+
+#get energy eigen values from Ps
+energy_eigenvalues,As=np.linalg.eig(Ps)
+
+#sort the energy eigenvalues 
+order=np.argsort(energy_eigenvalues)
+sorted_energy_eigenvalues=np.zeros((kappas.size,2))
+for i in range(kappas.size):
+	sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
+
+
+for i in range(dim):
+	plt.scatter(kappas,sorted_energy_eigenvalues[:,i])
+
+#plot the expected curve when single basis state is used
+def test_E0(kappa):
+	return (e2/r0)*(4/(kappa**2)-27/(4*kappa))
+
 plt.plot(kappas,test_E0(kappas))
+
+#plt.scatter(kappas,E0,marker='.',color='C0')
+
+
+
 plt.show()
