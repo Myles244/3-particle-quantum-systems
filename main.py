@@ -10,9 +10,9 @@ r0=0.53917#Angstroms
 #charge on the nuclius is emelentry charge units
 Z=2
 #reduced plancs constant
-hbar=1 ##find value
+hbar=6.5821220*10**(-16)#eV
 #mass of electorn
-me=1#update
+me=9.11*10**(-31)#kg
 
 #plot the expected curve when single basis state is used
 kappas=np.linspace(0.5,3,1000)
@@ -84,12 +84,18 @@ def P(kappa):
 	#calculating invs sqrt beta
 	invs_sqrt_beta=np.zeros((dim,dim))
 	for n in range(dim):
-		invs_sqrt_beta[n,n]=N_eigenvalues[n]
+		invs_sqrt_beta[n,n]=1/np.sqrt(N_eigenvalues[n])
 	
 	#calculating Y
 	Y=N_eigenvectors
+	print(N)
+	print(H_tilde)
+	return invs_sqrt_beta@np.transpose(Y)@H_tilde@Y@invs_sqrt_beta
+myP=P(1)
+print(myP)
+E,_=np.linalg.eig(myP)
 
-	return invs_sqrt_beta@np.transpose(Y)@H@Y@invs_sqrt_beta
-P(1)
+print(E)
+plt.scatter([1],E/2)
 plt.plot(kappas,test_E0(kappas))
 plt.show()
