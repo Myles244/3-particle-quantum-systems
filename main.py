@@ -105,6 +105,9 @@ def P(kappa):
 	N=np.transpose(N)
 	H_tilde=np.transpose(H_tilde)
 
+	#print(H_tilde)
+	#print(N)
+
 	#finding the eigen values of N
 	N_eigenvalues, N_eigenvectors=np.linalg.eig(N)
 
@@ -128,13 +131,13 @@ def test_P(kappa):
 	N=(np.pi**2)*(ool**6)*np.array([
 		[np.ones(ool.size), (35/16)*ool, 	(3/2)*ool**2],
 		[(35/16)*ool, 		6*ool**2, 		(77/16)*ool**3],
-		[(3/2)*ool**2,		(77/16)*ool**3,	9*ool*4]
+		[(3/2)*ool**2,		(77/16)*ool**3,	9*ool**4]
 		])
 
 	C=(-Z*e2*2*np.pi**2)*(ool**5)*np.array([
 		[np.ones(ool.size), (30/16)*ool, 	(3/2)*ool**2],
 		[(30/16)*ool, 		(9/2)*ool**2, 	(70/16)*ool**3],
-		[(3/2)*ool**2,		(70/16)*ool**3,	9*ool*4]
+		[(3/2)*ool**2,		(70/16)*ool**3,	9*ool**4]
 		])
 
 	W=e2*((5*np.pi**2)/8)*(ool**5)*np.array([
@@ -152,11 +155,13 @@ def test_P(kappa):
 	H_tilde=np.transpose(C+W+T)
 	N=np.transpose(N)
 
+	#print("example\n",H_tilde)
+	#print(N)
+
 	#print("C:",C)
 	#print("T:",T)
 	#print("W:",W)
 
-	#finding the eigen values of N
 	N_eigenvalues, N_eigenvectors=np.linalg.eig(N)
 
 	#calculating invs sqrt beta
@@ -176,7 +181,9 @@ def test_P(kappa):
 
 kappas=np.linspace(0.8,3,100)
 
+
 test_Ps=test_P(kappas)
+
 Ps=P(kappas)
 
 #get energy eigen values from Ps
@@ -196,7 +203,7 @@ for i in range(kappas.size):
 
 for i in range(dim):
 	plt.scatter(kappas,sorted_energy_eigenvalues[:,i],color='C'+str(i),marker='.')
-	#plt.plot(kappas,sorted_test_energy_eigenvalues[:,i],color='C'+str(i))
+	plt.plot(kappas,sorted_test_energy_eigenvalues[:,i],color='C'+str(i))
 
 #plt.scatter(kappas,sorted_test_energy_eigenvalues[:,1])
 
