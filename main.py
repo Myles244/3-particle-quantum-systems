@@ -14,9 +14,16 @@ hbar=6.5821220*10**(-16)#eVs
 #mass of electorn
 me=hbar**2/(r0*e2)
 
-
 #the ijm value associated with each n value
-jkms=np.array([[0,0,0],[0,0,1],[0,2,0]])#,[0,1,0],[1,0,0]])
+crd=2 #cube root dim
+pjkmv=np.arange(0,crd) # posible jkm values
+jkms=np.zeros((crd**3,3),dtype=int)
+for j in range(crd):
+	for k in range(crd):
+		for m in range(crd):
+			jkms[(crd**2)*j+crd*k+m]=[j,k,m]
+
+jkms=[[0,0,0],[0,2,0],[0,0,1]]
 
 #the dimension of the vector space created by the phi_n vectors
 dim=np.shape(jkms)[0]
@@ -179,16 +186,12 @@ def test_P(kappa):
 
 
 
-kappas=np.linspace(0.8,3,100)
-
-
-test_Ps=test_P(kappas)
+kappas=np.linspace(0.8,1.5,10000)
 
 Ps=P(kappas)
 
 #get energy eigen values from Ps
 energy_eigenvalues,zs=np.linalg.eig(Ps)
-test_energy_eigenvalues,test_zs=np.linalg.eig(test_Ps)
 
 #sort the energy eigenvalues 
 order=np.argsort(energy_eigenvalues)
@@ -196,16 +199,17 @@ sorted_energy_eigenvalues=np.zeros((kappas.size,dim))
 for i in range(kappas.size):
 	sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
 
-test_order=np.argsort(test_energy_eigenvalues)
-sorted_test_energy_eigenvalues=np.zeros((kappas.size,dim))
-for i in range(kappas.size):
-	sorted_test_energy_eigenvalues[i]=test_energy_eigenvalues[i,test_order[i]]
-
 for i in range(dim):
 	plt.scatter(kappas,sorted_energy_eigenvalues[:,i],color='C'+str(i),marker='.')
-	plt.plot(kappas,sorted_test_energy_eigenvalues[:,i],color='C'+str(i))
+
+#find optimal k
+kappas_order=np.argsort(sorted_energy_eigenvalues[:,0])
+optimal_kappa=kappas[kappas_order[0]]
+optimal_energy_eigenvalues=sorted_energy_eigenvalues[kappas_order[0]]
+plt.plot([optimal_kappa,optimal_kappa],[-100,600],'--')
 
 #plt.scatter(kappas,sorted_test_energy_eigenvalues[:,1])
+
 
 
 #plot the expected curve when single basis state is used
@@ -214,6 +218,8 @@ def test_E0(kappa):
 
 #plt.plot(kappas,test_E0(kappas))
 
+print("Optimal value for kappa:",optimal_kappa)
+print("Coresponing energy eigenvalues:",optimal_energy_eigenvalues)
 
 
 #plt.scatter(kappas,E0,marker='.',color='C0')

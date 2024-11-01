@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import matplotlib.axes
+import matplotlib.animation as animation
 import numpy as np
 
 #turns a complex number into an rgb colour code where the hue represents the phase and the amplitude is the luminosity
@@ -40,3 +41,46 @@ def plot(complex_values):
 	#plt.show()
 	plt.show()
 
+def plot3d(wavefunction=lambda x:np.exp(-x**2)):
+
+	fig = plt.figure()
+	ax = fig.add_subplot(projection='3d')
+
+	def initiate():
+		# Make data
+		theta = np.linspace(0, np.pi, 400)
+		phi = np.linspace(0, 2*np.pi, 400)
+
+		x = 10 * np.outer(np.sin(theta),np.cos(phi))
+		y = 10 * np.outer(np.sin(theta),np.sin(phi))
+		z = 10 * np.outer(np.cos(theta),np.ones(np.size(phi)))
+
+		colours=np.ones((np.shape(z)[0],np.shape(z)[1],3))
+		colours[:,:,0]=np.outer(np.ones(np.size(phi)),phi)/(2*np.pi)
+		#print(colours)
+		colours=matplotlib.colors.hsv_to_rgb(colours)
+
+		# Plot the surface
+		ax.plot_surface(x, y, z,rstride=1,cstride=1,antialiased=True, facecolors = colours)
+
+		# Set an equal aspect ratio
+		ax.set_aspect('equal')
+
+		ax.set_axis_off()
+
+	def rotate(frame_data):
+		print(frame_data)
+
+		azim=frame_data
+		elev=30*np.sin(azim*(np.pi/(270)))
+		roll=0
+
+		# Update the axis view and title
+		ax.view_init(elev, azim, roll)
+
+	# Only save last 100 frames, but run forever
+	ani = animation.FuncAnimation(fig, rotate,frames=1080,init_func=initiate)
+
+	ani.save('scatter.gif', fps=60, dpi=300)
+
+plot3d()
