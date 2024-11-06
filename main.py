@@ -112,6 +112,8 @@ def P(kappa):
 	N=np.transpose(N)
 	H_tilde=np.transpose(H_tilde)
 
+	print()
+
 	#print(H_tilde)
 	#print(N)
 
@@ -128,76 +130,27 @@ def P(kappa):
 	Y=N_eigenvectors
 	Y_T=np.transpose(Y,axes=[0,2,1])
 
-	#returning P	
-	return invs_sqrt_beta@Y_T@H_tilde@Y@invs_sqrt_beta
+	#P	
+	P=invs_sqrt_beta@Y_T@H_tilde@Y@invs_sqrt_beta
 
+	#get energy eigen values from Ps
+	energy_eigenvalues,zs=np.linalg.eig(P)	
 
-def test_P(kappa):
-	ool=(kappa*r0)/Z #ome over lambda
+	#sort the energy eigenvalues 
+	order=np.argsort(energy_eigenvalues)
+	sorted_energy_eigenvalues=np.zeros((kappas.size,dim))
+	sorted_zs=np.zeros(np.shape())
+	for i in range(kappas.size):
+		sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
+		sorted_zs[i]=zs[i,order[i]]
+	
 
-	N=(np.pi**2)*(ool**6)*np.array([
-		[np.ones(ool.size), (35/16)*ool, 	(3/2)*ool**2],
-		[(35/16)*ool, 		6*ool**2, 		(77/16)*ool**3],
-		[(3/2)*ool**2,		(77/16)*ool**3,	9*ool**4]
-		])
-
-	C=(-Z*e2*2*np.pi**2)*(ool**5)*np.array([
-		[np.ones(ool.size), (30/16)*ool, 	(3/2)*ool**2],
-		[(30/16)*ool, 		(9/2)*ool**2, 	(70/16)*ool**3],
-		[(3/2)*ool**2,		(70/16)*ool**3,	9*ool**4]
-		])
-
-	W=e2*((5*np.pi**2)/8)*(ool**5)*np.array([
-		[np.ones(ool.size), (1.6)*ool, 		(0.9)*ool**2],
-		[(1.6)*ool, 		(3.5)*ool**2, 	(2.4)*ool**3],
-		[(0.9)*ool**2,		(2.4)*ool**3,	(3.9)*ool**4]
-		])
-
-	T=((hbar**2)/(2*me))*(2*np.pi**2)*(ool**4)*np.array([
-		[np.ones(ool.size), (25/16)*ool, 	(3/2)*ool**2],
-		[(25/16)*ool, 		4*ool**2, 		(73/16)*ool**3],
-		[(3/2)*ool**2,		(73/16)*ool**3,	15*ool**4]
-		])
-
-	H_tilde=np.transpose(C+W+T)
-	N=np.transpose(N)
-
-	#print("example\n",H_tilde)
-	#print(N)
-
-	#print("C:",C)
-	#print("T:",T)
-	#print("W:",W)
-
-	N_eigenvalues, N_eigenvectors=np.linalg.eig(N)
-
-	#calculating invs sqrt beta
-	invs_sqrt_beta=np.zeros((dim,dim,np.size(kappa)))
-	for n in range(dim):
-		invs_sqrt_beta[n,n]=1/np.sqrt(N_eigenvalues[:,n])
-	invs_sqrt_beta=np.transpose(invs_sqrt_beta)
-
-	#calculating Y
-	Y=N_eigenvectors
-	Y_T=np.transpose(Y,axes=[0,2,1])
-
-	#returning P	
-	return invs_sqrt_beta@Y_T@H_tilde@Y@invs_sqrt_beta
-
-
+#this is a change blah blah blah
 
 kappas=np.linspace(0.8,1.5,10000)
 
-Ps=P(kappas)
 
-#get energy eigen values from Ps
-energy_eigenvalues,zs=np.linalg.eig(Ps)
 
-#sort the energy eigenvalues 
-order=np.argsort(energy_eigenvalues)
-sorted_energy_eigenvalues=np.zeros((kappas.size,dim))
-for i in range(kappas.size):
-	sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
 
 plt.scatter(kappas,sorted_energy_eigenvalues[:,0],color='C'+str(i),marker='.')
 
@@ -230,5 +183,10 @@ def phi(jkl,kappa,r1,r2):
 		*(r12_norm)**jkl[2]
 		*np.exp((-Z/(kappa*r0))*(r1_norm+r2_norm))
 		)
+
+def phi_0(r):
+	value=0
+	for n in range(dim):
+		value+=
 
 plt.show()
