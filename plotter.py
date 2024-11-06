@@ -41,22 +41,27 @@ def plot(complex_values):
 	#plt.show()
 	plt.show()
 
-def plot3d(wavefunction=lambda x:np.exp(-x**2)):
+def plot3d(, filename="animation.gif"):
 
 	fig = plt.figure()
 	ax = fig.add_subplot(projection='3d')
 
 	def initiate():
 		# Make data
-		theta = np.linspace(0, np.pi, 400)
-		phi = np.linspace(0, 2*np.pi, 400)
+		theta = np.linspace(0, np.pi, 50)
+		phi = np.linspace(0, 2*np.pi, 50)
+		phitheta=np.meshgrid(phi,theta)
+		print(phitheta[1])
+		print(np.outer(theta,np.ones(np.size(phi))))
+		radius=display_radius(phitheta)
 
-		x = 10 * np.outer(np.sin(theta),np.cos(phi))
-		y = 10 * np.outer(np.sin(theta),np.sin(phi))
-		z = 10 * np.outer(np.cos(theta),np.ones(np.size(phi)))
+
+		x = radius * np.outer(np.sin(theta),np.cos(phi))
+		y = radius * np.outer(np.sin(theta),np.sin(phi))
+		z = radius * np.outer(np.cos(theta),np.ones(np.size(phi)))
 
 		colours=np.ones((np.shape(z)[0],np.shape(z)[1],3))
-		colours[:,:,0]=np.outer(np.ones(np.size(phi)),phi)/(2*np.pi)
+		colours[:,:,0]=display_phase(phitheta)
 		#print(colours)
 		colours=matplotlib.colors.hsv_to_rgb(colours)
 
@@ -81,6 +86,11 @@ def plot3d(wavefunction=lambda x:np.exp(-x**2)):
 	# Only save last 100 frames, but run forever
 	ani = animation.FuncAnimation(fig, rotate,frames=1080,init_func=initiate)
 
-	ani.save('scatter.gif', fps=60, dpi=300)
+	#ani.save(filename, fps=60, dpi=100)
 
-plot3d()
+	plt.show()
+
+plot3d(
+		display_radius=lambda phitheta:np.abs(np.cos(2*phitheta[1])),
+		display_phase=lambda phitheta:phitheta[0]/(2*np.pi)
+	)

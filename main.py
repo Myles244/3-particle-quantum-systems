@@ -199,14 +199,13 @@ sorted_energy_eigenvalues=np.zeros((kappas.size,dim))
 for i in range(kappas.size):
 	sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
 
-for i in range(dim):
-	plt.scatter(kappas,sorted_energy_eigenvalues[:,i],color='C'+str(i),marker='.')
+plt.scatter(kappas,sorted_energy_eigenvalues[:,0],color='C'+str(i),marker='.')
 
 #find optimal k
 kappas_order=np.argsort(sorted_energy_eigenvalues[:,0])
 optimal_kappa=kappas[kappas_order[0]]
 optimal_energy_eigenvalues=sorted_energy_eigenvalues[kappas_order[0]]
-plt.plot([optimal_kappa,optimal_kappa],[-100,600],'--')
+#plt.plot([optimal_kappa,optimal_kappa],[-100,150],'--')
 
 #plt.scatter(kappas,sorted_test_energy_eigenvalues[:,1])
 
@@ -221,7 +220,15 @@ def test_E0(kappa):
 print("Optimal value for kappa:",optimal_kappa)
 print("Coresponing energy eigenvalues:",optimal_energy_eigenvalues)
 
-
-#plt.scatter(kappas,E0,marker='.',color='C0')
+def phi(jkl,kappa,r1,r2):
+	r1_norm=np.linalg.norm(r1,axis=-1)
+	r2_norm=np.linalg.norm(r2,axis=-1)
+	r12_norm=np.linalg.norm(r2-r1,axis=-1)
+	return (
+		(r1_norm+r2_norm)**jkl[0]
+		*(r1_norm+r2_norm)**jkl[1]
+		*(r12_norm)**jkl[2]
+		*np.exp((-Z/(kappa*r0))*(r1_norm+r2_norm))
+		)
 
 plt.show()
