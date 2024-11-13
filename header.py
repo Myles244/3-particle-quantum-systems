@@ -144,8 +144,8 @@ def find_E(kappas,jkms,return_as=False):
 
 def binary_search(f):
 	current_best=np.array([1,f(1)])
-	furthest_left=np.array([0.1,f(0.1)])
-	furthest_right=np.array([2,f(2)])
+	furthest_left=np.array([0.8,f(0.1)])
+	furthest_right=np.array([1.2,f(2)])
 	min_error=0.00001
 	while (np.abs(furthest_right[0]-furthest_left[0])>min_error):
 		value_to_decide=(current_best+furthest_left)/2

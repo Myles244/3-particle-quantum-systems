@@ -131,35 +131,6 @@ kappas_order=np.argsort(subEs[-1])
 optimal_kappa=subkappas[kappas_order[0]]
 optimal_energy_eigenvalues=subEs[-1,kappas_order[0]]
 
-def binary_search(f):
-	current_best=np.array([1,f(1)])
-	furthest_left=np.array([0.1,f(0.1)])
-	furthest_right=np.array([2,f(2)])
-	min_error=0.00001
-	while (np.abs(furthest_right[0]-furthest_left[0])>min_error):
-		value_to_decide=(current_best+furthest_left)/2
-		value_to_decide[1]=f(value_to_decide[0])
-
-		if value_to_decide[1]<current_best[1]:
-			furthest_right=current_best
-			current_best=value_to_decide
-
-		elif value_to_decide[1]>=current_best[1]:
-			furthest_left=value_to_decide
-
-		value_to_decide=(current_best+furthest_right)/2
-		value_to_decide[1]=f(value_to_decide[0])
-
-		if value_to_decide[1]<current_best[1]:
-			furthest_left=current_best
-			current_best=value_to_decide
-
-		elif value_to_decide[1]>=current_best[1]:
-			furthest_right=value_to_decide
-
-		print(current_best)
-	return current_best
-
 best_kappa=binary_search(lambda val:find_E(val,jkmss[-1])[0,0])
 
 axins.scatter(best_kappa[0],best_kappa[1],marker='o',color='C3')
