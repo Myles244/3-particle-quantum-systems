@@ -66,7 +66,7 @@ def fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl):
 		)
 	)
 
-def find_E(kappas,jkms):
+def find_E(kappas,jkms,return_as=False):
 
 	dim=np.shape(jkms)[0]
 
@@ -128,9 +128,45 @@ def find_E(kappas,jkms):
 	#sort the energy eigenvalues 
 	order=np.argsort(energy_eigenvalues)
 	sorted_energy_eigenvalues=np.zeros((np.size(kappas),dim))
-	sorted_zs=np.zeros(zs.shape)
+	sorted_As=np.zeros(zs.shape)
 	for i in range(np.size(kappas)):
 		sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
-		sorted_zs[i]=zs[i,order[i]]
 	
-	return sorted_energy_eigenvalues
+
+	if return_as==False:
+		return sorted_energy_eigenvalues
+	
+	else:
+		As=Y@invs_sqrt_beta@zs
+		for i in range(np.size(kappas)):
+			sorted_As[i]=As[i,order[i]]
+		return sorted_energy_eigenvalues,sorted_As
+
+def binary_search(f):
+	current_best=np.array([1,f(1)])
+	furthest_left=np.array([0.1,f(0.1)])
+	furthest_right=np.array([2,f(2)])
+	min_error=0.00001
+	while (np.abs(furthest_right[0]-furthest_left[0])>min_error):
+		value_to_decide=(current_best+furthest_left)/2
+		value_to_decide[1]=f(value_to_decide[0])
+
+		if value_to_decide[1]<current_best[1]:
+			furthest_right=current_best
+			current_best=value_to_decide
+
+		elif value_to_decide[1]>=current_best[1]:
+			furthest_left=value_to_decide
+
+		value_to_decide=(current_best+furthest_right)/2
+		value_to_decide[1]=f(value_to_decide[0])
+
+		if value_to_decide[1]<current_best[1]:
+			furthest_left=current_best
+			current_best=value_to_decide
+
+		elif value_to_decide[1]>=current_best[1]:
+			furthest_right=value_to_decide
+
+		print(current_best)
+	return current_best
