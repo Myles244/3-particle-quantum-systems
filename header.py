@@ -1,209 +1,107 @@
 import numpy as np
-import math
-import matplotlib.pyplot as plt
-from matplotlib.patches import ConnectionPatch
-import scipy.constants as cnst
 
-# --- constants ---
-#in units of angstroms and electron volts, where the prefactor 1/(4 pi epsilon0) has been absorbed into the definition of electric charge
+class Subspace:
 
-#elementry charge squared
-e2=(cnst.e**2/(4*np.pi*cnst.epsilon_0))/(cnst.eV*cnst.angstrom)
+  def __init__(self, dim):
 
-#bohr radius
-r0=(4*np.pi*cnst.epsilon_0*cnst.hbar**2)/(cnst.angstrom*cnst.m_e*cnst.e**2)
+    #the dimension of the subspace
+    self.dim = dim
 
-#charge on the nuclius is emelentry charge units
-Z=2
+  def set_N_func(self,f):
+    #a funciton that given two indecies and some other paramiters returns the specified element of the N ie the inner product
+    self.N_func=f
 
-#reduced plancs constant
-hbar=cnst.hbar/cnst.eV
+  def set_H_func(self,f):
+    #a funciton that given two indecies and some other paramiters returns the specified element of the projecitno of the hamiltonian
+    self.H_func=f
 
-#mass of electorn
-me=cnst.m_e*cnst.angstrom**2/cnst.eV
+  def set_params(self,num,params):
+    #the paramiters that are used to calculate H and N matrices
+    self.num=num
+    self.params=params
 
-#generator function of elements of N for hylleraas' basis states given J K M and one over two lambda or 'ootl'
-def fN(J,K,M,ootl):
-	if M==-2:
-		return 0
-	elif K%2 ==0:
-		return (
-			2*np.pi**2 
-			* math.factorial(J+K+M+5) 
-			* ootl**(J+K+M+6) 
-			* (1/(M+2)) 
-			* (1/(K+1) - 1/(K+3) - 1/(K+M+3) + (1/(K+M+5)))
-		)
-	else:
-		return 0
+  def make_N_mats(self):
+    #generate N matrices from N_func
+    print("Constructing the N matrices.")
 
-#generator function of elements of C for hylleraas' basis states given J K M and one over two lambda or 'ootl'
-def fC(J, K, M, ootl):
-	if M==-2:
-		return 0
-	elif K%2==0:
-		return (
-			8*np.pi**2 
-			* math.factorial(J+K+M+4) 
-			* ootl**(J+K+M+5) 
-			* (1/(M+2)) 
-			* (1/(1+K)-1/(K+M+3))
-		)
-	else:
-		return 0
+    mats=np.empty((self.dim,self.dim,self.num))
 
-#generator function of elements of T for hylleraas' basis states given J K M and one over two lambda or 'ootl'
-def fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl):
-	return (
-		(hbar**2)/(2*me) * ( 
-			2 * (
-				(l**2)*fN(J,K,M,ootl) 
-				- J*l*fN(J-1,K,M,ootl) 
-				+ j*j_prime*fN(J-2,K,M,ootl) 
-				+ k*k_prime*fN(J,K-2,M,ootl) 
-				+ m* m_prime*fN(J,K,M-2,ootl)
-				) 
-			+(1/2)*(
-				-M*l*(fC(J,K,M,ootl)-fC(J,K+2,M-2,ootl))
-				+ (m*j_prime + m_prime*j)*(fC(J-1,K,M,ootl)-fC(J-1,K+2,M-2,ootl)) 
-				+ (m*k_prime + m_prime*k)*(fC(J+1,K,M-2,ootl)-fC(J-1,K,M,ootl))
-			)
-		)
-	)
+    for i in range(self.dim):
+      for j in range(self.dim):
+        mats[i,j]=self.N_func(i,j,*self.params)
 
-#finds energy egien values (and their corosponding eigen vectors in the projected hilber space if return_as=True) given a kapp and a let of the combitnations of jkm
-def find_E(kappas,jkms,return_as=False):
+    self.N_mats=np.transpose(mats)
+    
+  def make_H_mats(self):
+    #generate H matrices from H_func
+    print("Constructing the H matrices.")
 
-	#the dimension of the sub space
-	dim=np.shape(jkms)[0]
+    mats=np.empty((self.dim,self.dim,self.num))
 
-	#the N matrix defined as N_nn'=<psi_n|psi_n'>
-	N=np.zeros((dim,dim,np.size(kappas)))
+    for i in range(self.dim):
+      for j in range(self.dim):
+        mats[i,j]=self.H_func(i,j,*self.params)
 
-	#the H_tilde matrix defined as H_nn'=<>
-	H_tilde=np.zeros((dim,dim,np.size(kappas)))
+    self.H_mats=np.transpose(mats)
 
-	#lambda
-	l=Z/(kappas*r0)
+  def find_N_eigens(self):
+    print("Finding the eigenvectors and eigenvalues of the N matrices.")
+    self.N_eigenvalues, self.N_eigenvectors=np.linalg.eigh(self.N_mats)
+  
+  def make_invs_sqrt_beta_mats(self):
 
-	#usefull constand 1/2lambda ie 'one over two lambda'
-	ootl=kappas*r0/(2*Z)
+    print("Constructing the inverse square root beta matrices.")
 
-	
-	#calculating elements of the N and H_tilde matrices
-	for n in range(dim):
-		for n_prime in range(dim):
-			j,k,m=jkms[n]
-			j_prime,k_prime,m_prime=jkms[n_prime]
-			J=j+j_prime
-			K=k+k_prime
-			M=m+m_prime
-			N[n,n_prime]=fN(J,K,M, ootl)
-			#print((n,n_prime))
-			#print("\tC:",fC(J,K,M,ootl))
-			#print("\tW:",fW(J,K,M,ootl))
-			#print("\tT:",fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl))
-			H_tilde[n,n_prime]=-Z*e2*fC(J,K,M, ootl)+e2*fN(J,K,M-1, ootl)+fT(j,j_prime,k,k_prime,m,m_prime,J,K,M, l,ootl)
-			#print(fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl))
+    invs_sqrt_beta=np.zeros((self.num,self.dim,self.dim))
+    for i in range(self.dim):
+      invs_sqrt_beta[:,i,i]=1/np.sqrt(self.N_eigenvalues[:,i])
 
-	#changing the N and H_tilde form matrices with lists as element to lists of matrices so that we can use broadcasting of matrix fucntions
-	N=np.transpose(N)
-	H_tilde=np.transpose(H_tilde)
+    self.invs_sqrt_beta_mats=invs_sqrt_beta
+    
+  def make_Y_mats(self):
 
-	#print(H_tilde)
-	#print(N)
+    print("Constructing the Y matrices.")
 
-	#finding the eigen values of N
-	N_eigenvalues, N_eigenvectors=np.linalg.eig(N)
+    self.Y=self.N_eigenvectors
 
-	#calculating invs sqrt beta
-	invs_sqrt_beta=np.zeros((dim,dim,np.size(kappas)))
-	for n in range(dim):
-		invs_sqrt_beta[n,n]=1/np.sqrt(N_eigenvalues[:,n])
-	invs_sqrt_beta=np.transpose(invs_sqrt_beta)
+  def make_P_mats(self):
 
-	#calculating Y
-	Y=N_eigenvectors
-	Y_T=np.transpose(Y,axes=[0,2,1])
+    print("Constructing the P matrices.")
 
-	#construct the P matrix
-	P=invs_sqrt_beta@Y_T@H_tilde@Y@invs_sqrt_beta
+    Y_T=np.transpose(self.Y, axes=[0,2,1])
 
-	#get energy eigen values from Ps
-	energy_eigenvalues,zs=np.linalg.eig(P)	
+    self.P_mats=self.invs_sqrt_beta_mats@Y_T@self.H_mats@self.Y@self.invs_sqrt_beta_mats
 
-	#sort the energy eigenvalues 
-	order=np.argsort(energy_eigenvalues)
-	sorted_energy_eigenvalues=np.zeros((np.size(kappas),dim))
-	sorted_As=np.zeros(zs.shape)
-	for i in range(np.size(kappas)):
-		sorted_energy_eigenvalues[i]=energy_eigenvalues[i,order[i]]
-	
-	#return the aplitudes if return_as==true else just return the energy eigen values
-	if return_as==False:
-		return sorted_energy_eigenvalues
-	
-	else:
-		As=Y@invs_sqrt_beta@zs
-		for i in range(np.size(kappas)):
-			sorted_As[i]=As[i,order[i]]
-		return sorted_energy_eigenvalues,sorted_As
+  def find_P_eigens(self):
 
-#use binary search like algorythem to find the optimal kappa
-#we can do this because we know the funciton has a single global minimum and is smooth
-def binary_search(f):
+    print("Finding P eigenvectors and eigenvalues.")
 
-	#staring information
-	#the minimum must be between furthest left and furthest right
-	current_best=np.array([1,f(1)])
-	furthest_left=np.array([0.8,f(0.1)])
-	furthest_right=np.array([1.2,f(2)])
+    self.P_eigenvalues, self.P_eigenvectors=np.linalg.eigh(self.P_mats)
 
-	#the uncertanty on kappa, at which the program will stop
-	min_error=0.00001
+  def find_energy_levels(self):
+    
+    print("Calculating the energy levels.")
 
-	#whist we havent yet satisfied our minimum error
-	while (np.abs(furthest_right[0]-furthest_left[0])>min_error):
+    energy_levels=np.sort(self.P_eigenvalues,axis=1)
 
-		#find the value in between our furthest left and best guess
-		#then by coparing it with the values we already know we can find a tighter constraint on kappa
-		#ie a better furthest left/furthest right/best guess
+    self.energy_levels=energy_levels
 
-		value_to_decide=(current_best+furthest_left)/2
-		value_to_decide[1]=f(value_to_decide[0])
+  def find_energy_eigenstates(self):
 
-		#if it is a new minumum use it has the current best and the current best is the new furthest right
-		if value_to_decide[1]<current_best[1]:
-			furthest_right=current_best
-			current_best=value_to_decide
+    print("Calculating the components of the energy eigenstates.")
 
-		#if it isint a new minmum then the minmum cant be to the left of it so we can set it to the new furthest left
-		elif value_to_decide[1]>=current_best[1]:
-			furthest_left=value_to_decide
+    order=np.argsort(self.P_eigenvalues,axis=1)
 
+    unorderd_energy_eigenstates=self.Y@self.invs_sqrt_beta_mats@self.P_eigenvectors
 
-		# now we can do the same for the furthest right
-		value_to_decide=(current_best+furthest_right)/2
-		value_to_decide[1]=f(value_to_decide[0])
+    energy_eigenstates=np.zeros((self.num,self.dim,self.dim))
+    for i in range(self.num):
+      for j in range(self.dim):
+        energy_eigenstates[i,j]=unorderd_energy_eigenstates[i,:,order[i,j]]*np.sign(unorderd_energy_eigenstates[i,0,order[i,j]])/np.linalg.norm(unorderd_energy_eigenstates[i,order[i,j]])
 
-		if value_to_decide[1]<current_best[1]:
-			furthest_left=current_best
-			current_best=value_to_decide
+    self.energy_eigenstates=energy_eigenstates
 
-		elif value_to_decide[1]>=current_best[1]:
-			furthest_right=value_to_decide
+    
+    
+    
 
-		print(current_best)
-	return current_best
-
-#these are the basis funcitons but their not actually being used for anything atm
-def phi(jkl,kappa,r1,r2):
-	r1_norm=np.linalg.norm(r1,axis=-1)
-	r2_norm=np.linalg.norm(r2,axis=-1)
-	r12_norm=np.linalg.norm(r2-r1,axis=-1)
-	return (
-		(r1_norm+r2_norm)**jkl[0]
-		*(r1_norm+r2_norm)**jkl[1]
-		*(r12_norm)**jkl[2]
-		*np.exp((-Z/(kappa*r0))*(r1_norm+r2_norm))
-		)
