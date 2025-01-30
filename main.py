@@ -107,11 +107,13 @@ def H_func(n,n_prime,kappas):
 	
 subspace.set_H_func(H_func)
 
-subspace.set_params(1000,[np.linspace(0.5,3,1000)])
+subspace.set_params(1000,[np.linspace(0.5,1.6,1000)])
 
 subspace.make_N_mats()
 subspace.make_H_mats()
 subspace.find_N_eigens()
+subspace.make_Y_mats()
+subspace.make_invs_sqrt_beta_mats()
 subspace.make_P_mats()
 subspace.find_P_eigens()
 subspace.find_energy_levels()

@@ -46,30 +46,37 @@ class Subspace:
 
   def find_N_eigens(self):
     print("Finding the eigenvectors and eigenvalues of the N matrices.")
-    self.N_eigenvalues, self.N_eigenvectors=np.linalg.eig(self.N_mats)
+    self.N_eigenvalues, self.N_eigenvectors=np.linalg.eigh(self.N_mats)
   
+  def make_invs_sqrt_beta_mats(self):
+
+    print("Constructing the inverse square root beta matrices.")
+
+    invs_sqrt_beta=np.zeros((self.num,self.dim,self.dim))
+    for i in range(self.dim):
+      invs_sqrt_beta[:,i,i]=1/np.sqrt(self.N_eigenvalues[:,i])
+
+    self.invs_sqrt_beta_mats=invs_sqrt_beta
+    
+  def make_Y_mats(self):
+
+    print("Constructing the Y matrices.")
+
+    self.Y=self.N_eigenvectors
+
   def make_P_mats(self):
 
     print("Constructing the P matrices.")
-    
-    #calculating invs sqrt beta
-    invs_sqrt_beta=np.zeros((self.dim,self.dim,self.num))
-    for i in range(self.dim):
-      invs_sqrt_beta[i,i]=1/np.sqrt(self.N_eigenvalues[:,i])
-    invs_sqrt_beta=np.transpose(invs_sqrt_beta)
 
-    #calculating Y
-    Y=self.N_eigenvectors
-    Y_T=np.transpose(Y,axes=[0,2,1])
+    Y_T=np.transpose(self.Y, axes=[0,2,1])
 
-    #construct the P matrix
-    self.P_mats=invs_sqrt_beta@Y_T@self.H_mats@Y@invs_sqrt_beta
+    self.P_mats=self.invs_sqrt_beta_mats@Y_T@self.H_mats@self.Y@self.invs_sqrt_beta_mats
 
   def find_P_eigens(self):
 
     print("Finding P eigenvectors and eigenvalues.")
 
-    self.P_eigenvalues, self.P_eigenvectors=np.linalg.eig(self.P_mats)
+    self.P_eigenvalues, self.P_eigenvectors=np.linalg.eigh(self.P_mats)
 
   def find_energy_levels(self):
     
@@ -78,6 +85,23 @@ class Subspace:
     energy_levels=np.sort(self.P_eigenvalues,axis=1)
 
     self.energy_levels=energy_levels
+
+  def find_energy_eigenstates(self):
+
+    print("Calculating the components of the energy eigenstates.")
+
+    order=np.argsort(self.P_eigenvalues,axis=1)
+
+    unorderd_energy_eigenstates=self.Y@self.invs_sqrt_beta_mats@self.P_eigenvectors
+
+    energy_eigenstates=np.zeros((self.num,self.dim,self.dim))
+    for i in range(self.num):
+      for j in range(self.dim):
+        energy_eigenstates[i,j]=unorderd_energy_eigenstates[i,:,order[i,j]]*np.sign(unorderd_energy_eigenstates[i,0,order[i,j]])/np.linalg.norm(unorderd_energy_eigenstates[i,order[i,j]])
+
+    self.energy_eigenstates=energy_eigenstates
+
+    
     
     
 
