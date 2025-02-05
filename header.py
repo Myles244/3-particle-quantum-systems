@@ -95,9 +95,11 @@ class Subspace:
     unorderd_energy_eigenstates=self.Y@self.invs_sqrt_beta_mats@self.P_eigenvectors
 
     energy_eigenstates=np.zeros((self.num,self.dim,self.dim))
+
     for i in range(self.num):
       for j in range(self.dim):
-        energy_eigenstates[i,j]=unorderd_energy_eigenstates[i,:,order[i,j]]*np.sign(unorderd_energy_eigenstates[i,0,order[i,j]])/np.linalg.norm(unorderd_energy_eigenstates[i,order[i,j]])
+        energy_eigenstates[i,j]=unorderd_energy_eigenstates[i,:,order[i,j]]/np.linalg.norm(unorderd_energy_eigenstates[i,:,order[i,j]]) #normalise vectors
+        energy_eigenstates[i,j]=energy_eigenstates[i,j]*np.sign(energy_eigenstates[i,j,0]) #set first element as posetive to avoid sign flipping
 
     self.energy_eigenstates=energy_eigenstates
 
