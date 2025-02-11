@@ -22,7 +22,7 @@ hbar=cnst.hbar/cnst.eV
 me=cnst.m_e*cnst.angstrom**2/cnst.eV
 
 
-subspace=Subspace(3)
+subspace=Subspace(1)
 
 #generator function of elements of N for hylleraas' basis states given J K M and one over two lambda or 'ootl'
 def fN(J,K,M,ootl):
@@ -73,7 +73,7 @@ def fT(j,j_prime,k,k_prime,m,m_prime,J,K,M,l,ootl):
 		)
 	)
 
-jkms=np.array([[0,0,0],[0,0,1],[0,2,0]])
+jkms=np.array([[0,0,0]])
 
 def N_func(n,n_prime,kappas):
         

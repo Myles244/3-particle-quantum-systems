@@ -8,11 +8,10 @@ import scipy.constants as cnst
 #mass of the alpha particle
 m1=(cnst.physical_constants['alpha particle mass'][0])*(10**(-12))**2/cnst.eV
 
-#mass of the muon
-m2=(cnst.physical_constants['muon mass'][0])*(10**(-12))**2/cnst.eV
-
 #mass of the electron
 m3=cnst.m_e*(10**(-12))**2/cnst.eV
+
+m2=m3
 
 #hbar
 hbar=cnst.hbar/cnst.eV
@@ -28,7 +27,7 @@ subspace=Subspace(1000)
 
 def N_func(i,j,alphas,betas,gammas):
         
-    return 512*(np.abs(alphas[i])*np.abs(betas[i])*np.abs(gammas[i])*np.abs(alphas[j])*np.abs(betas[j])*np.abs(gammas[j]))**1.5/((np.conj(alphas[i])+alphas[j])**3*(np.conj(betas[i])+betas[j])**3*(np.conj(gammas[i])+gammas[j])**3)
+    return (8*np.sqrt(np.abs(alphas[i])*np.abs(betas[i])*np.abs(gammas[i])*np.abs(alphas[j])*np.abs(betas[j])*np.abs(gammas[j]))/((np.conj(alphas[i])+alphas[j])*(np.conj(betas[i])+betas[j])*(np.conj(gammas[i])+gammas[j])))**3
 
 subspace.set_N_func(N_func)
 
@@ -57,18 +56,34 @@ def H_func(i,j,alphas,betas,gammas):
 
 	return (T+V)*N_func(i,j,alphas,betas,gammas)
 
-subspace.set_H_func(H_func)
+E=[]
 
-param_range=np.geomspace(0.01,100,10)
-params=np.expand_dims(np.array(np.meshgrid(param_range,param_range,param_range,indexing='ij')).reshape(3,-1),-1)
+ns=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]
 
-subspace.set_params(1,params)
+for n in ns:
+    print(n)
+    subspace=Subspace(n**3)
 
-subspace.make_N_mats_vectorized()
-subspace.make_H_mats_vectorized()
-subspace.find_N_eigens()
-subspace.make_Y_mats()
-subspace.make_invs_sqrt_beta_mats()
-subspace.make_P_mats()
-subspace.find_P_eigens()
-subspace.find_energy_levels()
+    subspace.set_N_func(N_func)
+    subspace.set_H_func(H_func)
+
+    param_range=np.geomspace(0.01,100,n)
+    params=np.expand_dims(np.array(np.meshgrid(param_range,param_range,param_range,indexing='ij')).reshape(3,-1),-1)
+
+    subspace.set_params(1,params)
+
+    subspace.make_N_mats_vectorized()
+    subspace.make_H_mats_vectorized()
+    subspace.find_N_eigens()
+    subspace.make_Y_mats()
+    subspace.make_invs_sqrt_beta_mats()
+    subspace.make_P_mats()
+    subspace.find_P_eigens()
+    subspace.find_energy_levels()
+
+    E.append(subspace.energy_levels[:,0])
+    
+import matplotlib.pyplot as plt
+plt.scatter(np.arange(len(E)),E)
+
+plt.show()

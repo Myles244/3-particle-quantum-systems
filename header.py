@@ -30,7 +30,7 @@ class Subspace:
       for j in range(self.dim):
         mats[i,j]=self.N_func(i,j,*self.params)
 
-    self.N_mats=np.transpose(mats)
+    self.N_mats=np.transpose(mats,[2,0,1])
     
   def make_H_mats(self):
     #generate H matrices from H_func
@@ -42,7 +42,19 @@ class Subspace:
       for j in range(self.dim):
         mats[i,j]=self.H_func(i,j,*self.params)
 
-    self.H_mats=np.transpose(mats)
+    self.H_mats=np.transpose(mats,[2,0,1])
+
+  def make_N_mats_vectorized(self):
+    #generate N matrices from N_func
+    print("Constructing the N matrices.")
+    indecies=np.array(np.meshgrid(np.arange(self.dim),np.arange(self.dim),indexing='ij')).transpose([1,2,0])
+    self.N_mats=np.transpose(self.N_func(indecies[:,:,0],indecies[:,:,1],*self.params),[2,0,1])
+
+  def make_H_mats_vectorized(self):
+    #generate H matrices from H_func
+    print("Constructing the H matrices.")
+    indecies=np.array(np.meshgrid(np.arange(self.dim),np.arange(self.dim),indexing='ij')).transpose([1,2,0])
+    self.H_mats=np.transpose(self.H_func(indecies[:,:,0],indecies[:,:,1],*self.params),[2,0,1])
 
   def find_N_eigens(self):
     print("Finding the eigenvectors and eigenvalues of the N matrices.")
