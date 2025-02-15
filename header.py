@@ -88,7 +88,7 @@ class Subspace:
 
     print("Finding P eigenvectors and eigenvalues.")
 
-    self.P_eigenvalues, self.P_eigenvectors=np.linalg.eigh(self.P_mats)
+    self.P_eigenvalues, self.P_eigenvectors=np.linalg.eig(self.P_mats)
 
   def find_energy_levels(self):
     

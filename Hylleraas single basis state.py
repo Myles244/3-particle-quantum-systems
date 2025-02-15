@@ -107,7 +107,7 @@ def H_func(n,n_prime,kappas):
 	
 subspace.set_H_func(H_func)
 
-subspace.set_params(1000,[np.linspace(0.5,1.6,1000)])
+subspace.set_params(1000,np.array([np.linspace(0.5,1.6,1000)]))
 
 subspace.make_N_mats()
 subspace.make_H_mats()
@@ -122,3 +122,5 @@ plt.plot(subspace.params[0],subspace.energy_levels[:,0])
 plt.ylim([-80,-60])
 plt.show()
 
+print(np.min(subspace.energy_levels))
+print(subspace.params[0,np.argmin(subspace.energy_levels)])
