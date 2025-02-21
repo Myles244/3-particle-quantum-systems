@@ -72,3 +72,5 @@ subspace.make_invs_sqrt_beta_mats()
 subspace.make_P_mats()
 subspace.find_P_eigens()
 subspace.find_energy_levels()
+
+print()
