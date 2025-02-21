@@ -7,7 +7,7 @@ class Subspace:
     #the dimension of the subspace
     self.dim = dim
 
-    self.verbose=False
+    self.verbose=verbose
 
   def set_N_func(self,f):
     #a funciton that given two indecies and some other paramiters returns the specified element of the N ie the inner product
