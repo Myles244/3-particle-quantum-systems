@@ -65,7 +65,7 @@ class Subspace:
   def find_N_eigens(self):
     if self.verbose:
       print("Finding the eigenvectors and eigenvalues of the N matrices.")
-    self.N_eigenvalues, self.N_eigenvectors=np.linalg.eigh(self.N_mats)
+    self.N_eigenvalues, self.N_eigenvectors=np.linalg.eig(self.N_mats)
   
   def make_invs_sqrt_beta_mats(self):
     if self.verbose:

@@ -1,37 +1,35 @@
-from header import *
+from normal_precision_calculations.header import *
 import scipy.constants as cnst
 
 # --- constants --- 
 
 #masses of nuclear particles:
         
-#time unit in seconds 
-T_unit=10**(-15)
-L_unit=10**(-12)
-E_unit=cnst.eV
-M_unit=E_unit*T_unit**2/L_unit**2
-
-assert(M_unit==E_unit*T_unit**2/L_unit**2)
-
 #mass of the alpha particle
-m1=(cnst.physical_constants['alpha particle mass'][0])/M_unit
+m1=(cnst.physical_constants['alpha particle mass'][0])/cnst.m_e
 
 #mass of the muon
-m2=(cnst.physical_constants['muon mass'][0])/M_unit
+m2=(cnst.physical_constants['muon mass'][0])/cnst.m_e
 
 #mass of the electron
-m3=cnst.m_e/M_unit
-
-m2=m3
+m3=1
 
 #hbar
-hbar=cnst.hbar/(E_unit*T_unit)
+hbar=1
 
 #elementry charge
-e=cnst.e
+e=1
 
 #vacume permiativity
-epsilon0=(cnst.physical_constants['vacuum electric permittivity'][0])*L_unit*E_unit
+epsilon0=1/(4*np.pi)
+
+alpha=cnst.alpha
+
+g2=2
+
+g3=2
+
+Hartree=27.211386245981
 
 #prefactor
 def pref(lambdas):
