@@ -1,35 +1,32 @@
-from normal_precision_calculations.header import *
+from header import *
 import scipy.constants as cnst
+
+#set the precision
+mp.dps = 100
 
 # --- constants --- 
 
 #masses of nuclear particles:
         
 #mass of the alpha particle
-m1=(cnst.physical_constants['alpha particle mass'][0])/cnst.m_e
+m1=mp.mpf(cnst.physical_constants['alpha particle mass'][0])/mp.mpf(cnst.m_e)
 
 #mass of the muon
-m2=(cnst.physical_constants['muon mass'][0])/cnst.m_e
+m2=mp.mpf(cnst.physical_constants['muon mass'][0])/mp.mpf(cnst.m_e)
 
 #mass of the electron
-m3=1
+m3=mp.mpf(1)
 
 #hbar
-hbar=1
+hbar=mp.mpf(1)
 
 #elementry charge
-e=1
+e=mp.mpf(1)
 
 #vacume permiativity
-epsilon0=1/(4*np.pi)
+four_pi_epsilon0=mp.mpf(1)
 
-alpha=cnst.alpha
 
-g2=2
-
-g3=2
-
-Hartree=27.211386245981
 
 #prefactor
 def pref(lambdas):
@@ -122,14 +119,14 @@ def H_func(i,j,alphas,betas,gammas):
 			((alphas[j]**2+betas[j]**2)/m1  +  (alphas[j]**2+gammas[j]**2)/m2  +  (betas[j]**2+gammas[j]**2)/m3)*I111(lambdas)
 			
 			-2*alphas[j]*(1/m1+1/m2)*I110(order(1,2,0,lambdas))
-			-2*betas[j]*(1/m1+1/m3)*I110(order(0,2,1,lambdas))  
-			-2*gammas[j]*(1/m2+1/m3)*I110(lambdas) 
+			-2*betas[j]*(1/m1+1/m3)*I110(order(0,2,1,lambdas))
+			-2*gammas[j]*(1/m2+1/m3)*I110(lambdas)
 				
 			+alphas[j]*betas[j]/m1*(I210(order(0,2,1,lambdas))+I210(order(1,2,0,lambdas))-I300(order(2,0,1,lambdas)))
 			+alphas[j]*gammas[j]/m2*(I210(lambdas)+I210(order(2,1,0,lambdas))-I300(order(1,0,2,lambdas)))
 			+betas[j]*gammas[j]/m3*(I210(order(1,0,2,lambdas))+I210(order(2,0,1,lambdas))-I300(lambdas))
 			)
 	
-	V=(e**2/(4*np.pi*epsilon0))*(-2*I110(order(1,2,0,lambdas))-2*I110(order(0,2,1,lambdas))+I110(lambdas))
+	V=(e**2/(four_pi_epsilon0))*(-2*I110(order(1,2,0,lambdas))-2*I110(order(0,2,1,lambdas))+I110(lambdas))
 
 	return T+V
