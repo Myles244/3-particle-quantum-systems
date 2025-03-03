@@ -6,3 +6,5 @@
     - still not working so i ended up rewriting the progeram using the mpmath library which has unlimited floating point precision
         -mostly just a replacement
 -seems to be working now, but much slower
+-got it to calculate the HFS and it has a decent agreements
+-quantify error, at least quantify convergence error

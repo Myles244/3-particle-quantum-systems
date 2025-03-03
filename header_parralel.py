@@ -1,5 +1,6 @@
 from mpmath import mp
 import numpy as np
+from multiprocessing import Pool
 
 
 #set the precision
@@ -46,7 +47,7 @@ class Subspace:
   def find_N_eigens(self):
     if self.verbose:
       print("Finding the eigenvectors and eigenvalues of the N matrices.")
-    self.N_eigenvalues, self.N_eigenvectors=mp.eigh(self.N_mat)
+    self.N_eigenvalues, self.N_eigenvectors=mp.eig(self.N_mat)
   
   def make_invs_sqrt_beta_mats(self):
     if self.verbose:
@@ -70,7 +71,7 @@ class Subspace:
     if self.verbose:
       print("Finding P eigenvectors and eigenvalues.")
 
-    self.P_eigenvalues, self.P_eigenvectors=mp.eigh(self.P_mats)
+    self.P_eigenvalues, self.P_eigenvectors=mp.eig(self.P_mats)
 
   def find_energy_levels(self):
     if self.verbose:
