@@ -4,7 +4,7 @@ from multiprocessing import Pool
 N=[]
 E=[]
 D=[]
-params=np.append(np.load("altparams.npy",allow_pickle=True),np.load("altaltparams.npy",allow_pickle=True),axis=1)
+params=np.load("data/altaltparams.npy",allow_pickle=True)
 
 
 def f(i):
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
         data=np.array(data)
 
-        np.save("convergence",data,allow_pickle=True)
+        np.save("data/convergence",data,allow_pickle=True)
 
 
 

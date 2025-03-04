@@ -1,18 +1,20 @@
 from exponential import *
-
+from time import time
 print()
 
 mp.dps=200
 
 #generate random params
-params=np.load("params.npy",allow_pickle=True)
-altparams=np.load("altparams.npy",allow_pickle=True)
-altaltparams=np.load("altaltparams.npy",allow_pickle=True)
+params=np.load("data/params.npy",allow_pickle=True)
+altparams=np.load("data/altparams.npy",allow_pickle=True)
+altaltparams=np.load("data/altaltparams.npy",allow_pickle=True)
 
 params=np.append(params,altparams,axis=1)
 params=np.append(params,altaltparams,axis=1)
 
 #calculate the energy levels
+
+starttime=time()
 subspace=Subspace(params.shape[1],verbose=True)
 
 subspace.set_N_func(N_func)
@@ -40,3 +42,5 @@ print("\nthe expectation of the delta:",expdelta)
 
 #calculate the hyperfine splitting
 print("\nThe hyperfine splitting:",HFS(expdelta),"\n")
+
+print("time",starttime-time())
