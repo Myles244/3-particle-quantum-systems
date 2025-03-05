@@ -2,7 +2,7 @@ from exponential import *
 from scipy.optimize import minimize
 from time import time
 
-params=np.load('params.npy',allow_pickle=True)
+params=np.load('data/params.npy',allow_pickle=True)
 
 def f(x):
         
@@ -55,8 +55,8 @@ for i in range(200):
     expdelta=delta(subspace.energy_eigenstates[0],params)
     print("the expectation of the delta:",expdelta)
 
-    res=minimize(f,x0=x0,method='Nelder-Mead')
+    res=minimize(f,x0=x0,method='Nelder-Mead',options={'xatol':0.01})
     params=np.append(params,np.expand_dims(np.array(res.x),1)*mp.mpf(1),axis=1)
     print(res)
     print("time",time()-starttime)
-    np.save("params",params,allow_pickle=True)
+    np.save("data/params",params,allow_pickle=True)
