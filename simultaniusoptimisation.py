@@ -36,10 +36,10 @@ def f(x):
     if subspace.energy_levels[0]<bestE:
         print("Success, new lowest energy level found, saving paramiters")
         print(np.float64(subspace.energy_levels[0]))
-        bestE=np.float64(subspace.energy_levels[0])
+        bestE=subspace.energy_levels[0]
         bestparams=theseparams
         np.save("data/bestparams.npy",bestparams,allow_pickle=True)
-    return np.float64(subspace.energy_levels[0])
+    return np.float64((subspace.energy_levels[0]+402.637302)*1*10**6)
 
 print(params.shape[1])
 

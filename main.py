@@ -5,12 +5,7 @@ print()
 mp.dps=200
 
 #generate random params
-params=np.load("data/params.npy",allow_pickle=True)
-altparams=np.load("data/altparams.npy",allow_pickle=True)
-altaltparams=np.load("data/altaltparams.npy",allow_pickle=True)
-
-params=np.append(params,altparams,axis=1)
-params=np.append(params,altaltparams,axis=1)
+params=np.load("data/bestparams.npy",allow_pickle=True)
 
 #calculate the energy levels
 
