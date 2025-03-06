@@ -17,7 +17,7 @@ def f(x):
         if a<0 or b<0 or c<0 or (a==0 and b==0) or (a==0 and c==0) or (b==0 and c==0):
             return 1000
         
-    subspace=Subspace(theseparams.shape[1],verbose=True)
+    subspace=Subspace(theseparams.shape[1])
 
     subspace.set_N_func(N_func)
     subspace.set_H_func(H_func)
@@ -32,9 +32,10 @@ def f(x):
     subspace.make_P_mats()
     subspace.find_P_eigens()
     subspace.find_energy_levels()
-    print(np.float64(subspace.energy_levels[0]))
+    
     if subspace.energy_levels[0]<bestE:
         print("Success, new lowest energy level found, saving paramiters")
+        print(np.float64(subspace.energy_levels[0]))
         bestE=np.float64(subspace.energy_levels[0])
         bestparams=theseparams
         np.save("data/bestparams.npy",bestparams,allow_pickle=True)
