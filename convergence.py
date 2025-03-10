@@ -1,8 +1,8 @@
 from exponential import *
 from multiprocessing import Pool
 
-filenames=["data/","data/alt","data/altalt"]
-fn=filenames[2]
+filenames=["data/best"]
+fn=filenames[0]
 
 N=[]
 E=[]
