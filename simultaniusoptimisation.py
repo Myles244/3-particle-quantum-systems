@@ -43,7 +43,7 @@ def f(x):
     subspace.make_P_mats()
     subspace.find_P_eigens()
     subspace.find_energy_levels()
-    
+    print(np.float64(subspace.energy_levels[0]))
     if subspace.energy_levels[0]<bestE:
         print("Success, new lowest energy level found, saving paramiters")
         print(np.float64(subspace.energy_levels[0]))
