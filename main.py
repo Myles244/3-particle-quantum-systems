@@ -5,7 +5,7 @@ print()
 mp.dps=200
 
 #generate random params
-params=np.load("data/bestparams.npy",allow_pickle=True)
+params=np.load("data/bestparams copy.npy",allow_pickle=True)
 
 #calculate the energy levels
 
@@ -31,9 +31,12 @@ subspace.find_energy_eigenstates()
 print("\nGround State energy level:",subspace.energy_levels[0])
 
 #calculate the exectation of the delta 
-expdelta=delta(subspace.energy_eigenstates[0],params)
+expdelta=delta_r23(subspace.energy_eigenstates[0],params)
 
-print("\nthe expectation of the delta:",expdelta)
+print("\nthe expectation of the delta23:",expdelta)
+from nuclear_structure_corection import *
+print("\nthe expectation of the delta13:",delta_r13(subspace.energy_eigenstates[0],params))
+print("\nthe expectation of the delta12:",delta_r12(subspace.energy_eigenstates[0],params))
 
 #calculate the hyperfine splitting
 print("\nThe hyperfine splitting:",HFS(expdelta),"\n")

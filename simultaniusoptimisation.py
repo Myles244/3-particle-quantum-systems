@@ -38,7 +38,7 @@ def f(x):
         print(np.float64(subspace.energy_levels[0]))
         bestE=subspace.energy_levels[0]
         bestparams=theseparams
-        np.save("data/bestparams.npy",bestparams,allow_pickle=True)
+        #np.save("data/bestparams.npy",bestparams,allow_pickle=True)
     return np.float64((subspace.energy_levels[0]+402.637302)*1*10**6)
 
 print(params.shape[1])

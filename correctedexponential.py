@@ -24,8 +24,6 @@ e=mp.mpf(1)
 #vacume permiativity
 four_pi_epsilon0=mp.mpf(1)
 
-
-
 #prefactor
 
 def pref(lambdas):
@@ -112,7 +110,7 @@ def order(first,second,third,lambdas):
             ]
 
 
-def H_func(i,j,alphas,betas,gammas):
+def H0_func(i,j,alphas,betas,gammas):
 
     lambdas=[
         1/(np.conjugate(alphas[i])+alphas[j]+np.conjugate(betas[i])+betas[j]),1/(np.conjugate(alphas[i])+alphas[j]+np.conjugate(gammas[i])+gammas[j]),  1/(np.conjugate(betas[i])+betas[j]+np.conjugate(gammas[i])+gammas[j]),  
@@ -154,7 +152,7 @@ def term(ai,bi,ci,aj,bj,cj):
     )
 
 
-def delta_r23(Amplitudes,params):
+def delta(Amplitudes,params):
     ais, ajs=np.meshgrid(params[0],params[0])
     bis, bjs=np.meshgrid(params[1],params[1])
     cis, cjs=np.meshgrid(params[2],params[2])
