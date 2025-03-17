@@ -1,22 +1,33 @@
 from exponential import *
 from scipy.optimize import minimize
 
-params=np.load("data/bestparams.npy",allow_pickle=True)
+params=np.load("data/best100params.npy",allow_pickle=True)
 bestparams=params
 
 x0=params.flatten()
 bestE=0
 
+nitt=0
+
 def f(x):
     global bestE
     global bestparams
-    theseparams=x.reshape(3,-1)*mp.mpf(1)
+    global nitt
+    nitt+=1
+    print(nitt)
+    theseparams=x.reshape(3,-1)*mp.mpf(1) 
 
     for i in range(theseparams.shape[1]):
         a,b,c=theseparams[:,i].flatten()
         if a<0 or b<0 or c<0 or (a==0 and b==0) or (a==0 and c==0) or (b==0 and c==0):
             return 1000
         
+    #symetry breaking condition reduces space of solutions synce its symetric
+    for i in range(theseparams.shape[1]-1):
+        if mp.norm(theseparams[:,i])>mp.norm(theseparams[:,i+1]):
+            return 1000
+        
+
     subspace=Subspace(theseparams.shape[1])
 
     subspace.set_N_func(N_func)
@@ -38,7 +49,11 @@ def f(x):
         print(np.float64(subspace.energy_levels[0]))
         bestE=subspace.energy_levels[0]
         bestparams=theseparams
-        np.save("data/bestparams.npy",bestparams,allow_pickle=True)
+        np.save("data/best100params.npy",bestparams,allow_pickle=True)
+
+        subspace.find_energy_eigenstates()
+        expdelta=delta(subspace.energy_eigenstates[0],params)
+        print(HFS(expdelta))
     return np.float64((subspace.energy_levels[0]+402.637302)*1*10**6)
 
 print(params.shape[1])
@@ -47,5 +62,5 @@ x0=params.flatten()
 
 f(x0)
 
-res=minimize(f,x0=x0)
+res=minimize(f,x0=x0,method='Nelder-Mead')
 print(res)

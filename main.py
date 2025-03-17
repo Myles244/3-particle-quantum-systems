@@ -17,7 +17,7 @@ subspace.set_H_func(H_func)
 
 subspace.set_params(params)
 
-subspace.make_N_mat()
+subspace.make_N_mat()``
 subspace.make_H_mat()
 subspace.find_N_eigens()
 subspace.make_Y_mat()
