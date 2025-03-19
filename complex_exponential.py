@@ -1,6 +1,10 @@
 from header import *
 import scipy.constants as cnst
 
+def mpc_sqrt(self):
+    return mp.sqrt(self)
+
+mp.mpc.sqrt=mpc_sqrt
 
 
 # --- constants --- 
@@ -24,6 +28,8 @@ e=mp.mpf(1)
 
 #vacume permiativity
 four_pi_epsilon0=mp.mpf(1)
+
+
 
 #prefactor
 
@@ -111,7 +117,7 @@ def order(first,second,third,lambdas):
             ]
 
 
-def H0_func(i,j,alphas,betas,gammas):
+def H_func(i,j,alphas,betas,gammas):
 
     lambdas=[
         1/(np.conjugate(alphas[i])+alphas[j]+np.conjugate(betas[i])+betas[j]),1/(np.conjugate(alphas[i])+alphas[j]+np.conjugate(gammas[i])+gammas[j]),  1/(np.conjugate(betas[i])+betas[j]+np.conjugate(gammas[i])+gammas[j]),  
@@ -132,7 +138,7 @@ def H0_func(i,j,alphas,betas,gammas):
             )
     
     V=(e**2/(four_pi_epsilon0))*(-2*I110(order(1,2,0,lambdas))-2*I110(order(0,2,1,lambdas))+I110(lambdas))
-
+    
     return T+V
 
 
@@ -153,7 +159,7 @@ def term(ai,bi,ci,aj,bj,cj):
     )
 
 
-def delta(Amplitudes,params):
+def delta_r23(Amplitudes,params):
     ais, ajs=np.meshgrid(params[0],params[0])
     bis, bjs=np.meshgrid(params[1],params[1])
     cis, cjs=np.meshgrid(params[2],params[2])
