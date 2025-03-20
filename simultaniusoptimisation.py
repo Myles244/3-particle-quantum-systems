@@ -52,7 +52,7 @@ def f(x):
         np.save("data/best100params.npy",bestparams,allow_pickle=True)
 
         subspace.find_energy_eigenstates()
-        expdelta=delta_r23(subspace.energy_eigenstates[0],params)
+        expdelta=delta_r23(subspace.energy_eigenstates[0],theseparams)
         print(HFS(expdelta))
     return np.float64((subspace.energy_levels[0]+402.637302)*1*10**6)
 
