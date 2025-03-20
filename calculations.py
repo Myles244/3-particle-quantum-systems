@@ -1,49 +1,37 @@
 from exponential import *
 from uncertainties import ufloat
 
-mp.dps=200
+mp.dps=100
 
 #load in good params
-params=np.load("data/bestparams.npy",allow_pickle=True)[:,:50]
+params=np.load("data/best100params.npy",allow_pickle=True)
 
-ground_state_energies=[]
-expdeltas=[]
+#generate random params
+#randomparams=np.abs(np.diag([400,1,0.02])@np.exp(np.random.normal(0,5,(3,50))))*mp.mpf(1)
 
-for i in range(100):
-    print(i)
-    #generate random params
-    randomparams=np.abs(np.diag([400,1,0.02])@np.exp(np.random.normal(0,5,(3,50))))*mp.mpf(1)
+#theseparams=np.append(params,randomparams,axis=1)
 
-    theseparams=np.append(params,randomparams,axis=1)
+#calculate the energy levels
+subspace=Subspace(params.shape[1], verbose=True)
 
-    #calculate the energy levels
-    subspace=Subspace(theseparams.shape[1])
+subspace.set_N_func(N_func)
+subspace.set_H_func(H_func)
 
-    subspace.set_N_func(N_func)
-    subspace.set_H_func(H_func)
+subspace.set_params(params)
 
-    subspace.set_params(theseparams)
+subspace.make_N_mat()
+subspace.make_H_mat()
+subspace.find_N_eigens()
+subspace.make_Y_mat()
+subspace.make_invs_sqrt_beta_mats()
+subspace.make_P_mats()
+subspace.find_P_eigens()
+subspace.find_energy_levels()
+subspace.find_energy_eigenstates()
 
-    subspace.make_N_mat()
-    subspace.make_H_mat()
-    subspace.find_N_eigens()
-    subspace.make_Y_mat()
-    subspace.make_invs_sqrt_beta_mats()
-    subspace.make_P_mats()
-    subspace.find_P_eigens()
-    subspace.find_energy_levels()
-    subspace.find_energy_eigenstates()
-
-    expdelta=delta(subspace.energy_eigenstates[0],theseparams)
-
-    ground_state_energies.append(np.float64(subspace.energy_levels[0]))
-    expdeltas.append(np.float64(expdelta))
+expdelta=delta_r23(subspace.energy_eigenstates[0],params)
 
 #define masses and gs with uncertainty
-
-def ufloat_from_sample(sample):
-    return ufloat(np.mean(sample),np.std(sample,ddof=1)/np.sqrt(len(sample)))
-
 def ufloat_from_const(name):
     temp=cnst.physical_constants[name]
     return ufloat(temp[0],temp[2])
@@ -64,14 +52,11 @@ def HFS(expdelta):
         )*MHz_conversion_factor
     return prefactor*expdelta
 
-import matplotlib.pyplot as plt
-plt.hist(np.float64(ground_state_energies))
-plt.show()
-plt.hist(np.float64(expdeltas))
-plt.show()
+def energy_Hartrees():
+    return np.float64(subspace.energy_levels[0])
 
-def ground_state_energy():
-    return "$"+str(ufloat_from_sample(ground_state_energies)*energyunit/1000)+"$ KeV"
+def energy_KeV():
+    return np.float64(subspace.energy_levels[0])*energyunit/1000
 
 def expectation_of_the_delta():
     return "$"+str(ufloat_from_sample(expdeltas))+"$"
