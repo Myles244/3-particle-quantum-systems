@@ -2,11 +2,12 @@ from exponential import *
 from time import time
 print()
 
-mp.dps=200
 
 #generate random params
-params=np.load("data/bestparams copy.npy",allow_pickle=True)
-
+params=np.load("data/best100params.npy",allow_pickle=True)
+#params=np.append(params,np.load("data/params.npy",allow_pickle=True),axis=1)
+#params=np.append(params,np.load("data/altparams.npy",allow_pickle=True),axis=1)
+#params=np.append(params,np.load("data/altparams.npy",allow_pickle=True),axis=1)
 #calculate the energy levels
 
 starttime=time()
@@ -34,9 +35,6 @@ print("\nGround State energy level:",subspace.energy_levels[0])
 expdelta=delta_r23(subspace.energy_eigenstates[0],params)
 
 print("\nthe expectation of the delta23:",expdelta)
-from nuclear_structure_corection import *
-print("\nthe expectation of the delta13:",delta_r13(subspace.energy_eigenstates[0],params))
-print("\nthe expectation of the delta12:",delta_r12(subspace.energy_eigenstates[0],params))
 
 #calculate the hyperfine splitting
 print("\nThe hyperfine splitting:",HFS(expdelta),"\n")
