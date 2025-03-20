@@ -7,10 +7,10 @@ import scipy.constants as cnst
 #masses of nuclear particles:
         
 #mass of the alpha particle
-m1=mp.mpf(cnst.physical_constants['alpha particle mass'][0])/mp.mpf(cnst.m_e)
+m1=mp.mpf("206.7682827")
 
 #mass of the muon
-m2=mp.mpf(cnst.physical_constants['muon mass'][0])/mp.mpf(cnst.m_e)
+m2=mp.mpf("7294.29954171")
 
 #mass of the electron
 m3=mp.mpf(1)
